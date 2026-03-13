@@ -82,3 +82,47 @@ def test_map_view_keeps_cursor_inside_viewport_window() -> None:
     assert map_view.viewport_y <= map_view.cursor_y < (
         map_view.viewport_y + FALLBACK_VIEWPORT_HEIGHT
     )
+
+
+def test_move_cursor_clamps_to_map_bounds() -> None:
+    colony_map = generate_map(width=8, height=6, seed=123)
+    map_view = MapView(colony_map)
+
+    map_view.cursor_x = 0
+    map_view.cursor_y = 0
+    moved = map_view.move_cursor(-10, -10)
+
+    assert moved is False
+    assert map_view.cursor_x == 0
+    assert map_view.cursor_y == 0
+
+    moved = map_view.move_cursor(999, 999)
+    assert moved is True
+    assert map_view.cursor_x == colony_map.width - 1
+    assert map_view.cursor_y == colony_map.height - 1
+
+
+def test_move_cursor_auto_scrolls_viewport_near_edge() -> None:
+    colony_map = generate_map(width=64, height=48, seed=456)
+    map_view = MapView(colony_map)
+
+    start_viewport_x = map_view.viewport_x
+    start_viewport_y = map_view.viewport_y
+
+    moved = map_view.move_cursor(25, 20)
+
+    assert moved is True
+    assert map_view.viewport_x > start_viewport_x
+    assert map_view.viewport_y > start_viewport_y
+
+
+def test_cursor_status_text_includes_coords_and_terrain() -> None:
+    colony_map = _sample_map()
+    map_view = MapView(colony_map)
+
+    map_view.cursor_x = 0
+    map_view.cursor_y = 0
+    status = map_view.cursor_status_text()
+
+    assert "Cursor (0, 0)" in status
+    assert "Terrain:" in status
