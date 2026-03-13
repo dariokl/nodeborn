@@ -1,5 +1,12 @@
-/* Base theme placeholder for S0.1. */
+/* Base app shell theme using S0.2 color tokens. */
 Screen {
-    background: $bg-base;
-    color: $text-base;
+    background: $surface-bg;
+    color: $text-primary;
+}
+
+Header,
+Footer {
+    background: $surface-panel;
+    color: $text-primary;
+    border: tall $surface-border;
 }

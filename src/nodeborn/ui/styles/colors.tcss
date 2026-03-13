@@ -1,4 +1,28 @@
-/* Semantic color placeholders for S0.1; expanded in S0.2. */
-$bg-base: #10161d;
-$text-base: #e6edf5;
-$accent-base: #5fb3b3;
+/* Core surfaces and text */
+$surface-bg: #10161d;
+$surface-panel: #16202a;
+$surface-border: #2a3948;
+$text-primary: #e6edf5;
+$text-muted: #9aa9b8;
+$accent-primary: #5fb3b3;
+
+/* Semantic state colors */
+$semantic-surplus: #4ade80;
+$semantic-stable: #60a5fa;
+$semantic-warning: #fbbf24;
+$semantic-critical: #f87171;
+$semantic-inactive: #6b7280;
+
+/* Resource colors */
+$resource-food: #84cc16;
+$resource-wood: #a16207;
+$resource-stone: #78716c;
+$resource-iron: #71717a;
+$resource-tools: #0ea5e9;
+$resource-gold: #eab308;
+
+/* Seasonal tints */
+$season-spring: #86efac;
+$season-summer: #fde047;
+$season-autumn: #fdba74;
+$season-winter: #cbd5e1;
