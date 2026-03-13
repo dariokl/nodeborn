@@ -8,3 +8,11 @@
     padding: 1 2;
     width: auto;
 }
+
+#map-view {
+    width: 1fr;
+    height: 1fr;
+    border: round $primary;
+    padding: 0 1;
+    background: $surface;
+}
