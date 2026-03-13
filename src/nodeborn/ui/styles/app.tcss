@@ -1,6 +1,25 @@
-Header,
+Screen {
+    background: $background;
+    color: $foreground;
+}
+
+Header {
+    background: $panel;
+    color: $foreground;
+
+}
+
+HeaderTitle {
+    color: #cbd5e1;
+    text-style: bold;
+}
+
+HeaderClock {
+    color: $accent;
+    text-style: bold;
+}
+
 Footer {
     background: $panel;
     color: $foreground;
-    border: none;
 }

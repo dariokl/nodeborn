@@ -30,7 +30,27 @@
 
 .dashboard-panel {
     background: $surface;
-    color: $foreground-muted;
-    border: round $border;
+    color: #94a3b8;
+    border: round #334155;
     padding: 1 2;
+}
+
+#panel-population {
+    border: round $primary;
+    color: $foreground;
+}
+
+#panel-resources {
+    border: round $success;
+    color: $foreground;
+}
+
+#panel-alerts {
+    border: round $warning;
+    color: $warning;
+}
+
+#panel-event-log {
+    border: round #6b7280;
+    color: $foreground;
 }
