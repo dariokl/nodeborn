@@ -1,0 +1,5 @@
+/* Base theme placeholder for S0.1. */
+Screen {
+    background: $bg-base;
+    color: $text-base;
+}

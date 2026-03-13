@@ -1,0 +1,4 @@
+/* Semantic color placeholders for S0.1; expanded in S0.2. */
+$bg-base: #10161d;
+$text-base: #e6edf5;
+$accent-base: #5fb3b3;
