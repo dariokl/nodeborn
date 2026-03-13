@@ -1,0 +1,36 @@
+#dashboard-grid {
+    layout: grid;
+    grid-size: 2;
+    grid-columns: 1fr 2fr;
+    grid-rows: 1fr 1fr;
+    grid-gutter: 1 2;
+    padding: 1 2;
+    height: 1fr;
+}
+
+#panel-population {
+    row-span: 1;
+    column-span: 1;
+}
+
+#panel-resources {
+    row-span: 1;
+    column-span: 1;
+}
+
+#panel-alerts {
+    row-span: 1;
+    column-span: 1;
+}
+
+#panel-event-log {
+    row-span: 1;
+    column-span: 1;
+}
+
+.dashboard-panel {
+    background: $surface;
+    color: $foreground-muted;
+    border: round $border;
+    padding: 1 2;
+}

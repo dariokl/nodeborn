@@ -17,6 +17,7 @@ class NodebornApp(App[None]):
 
     CSS_PATH = [
         "ui/styles/app.tcss",
+        "ui/styles/dashboard.tcss",
     ]
     TITLE = "Nodeborn"
     SUB_TITLE = "Day 1 | Spring | Clear"
