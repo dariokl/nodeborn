@@ -20,7 +20,7 @@ class DashboardScreen(Screen[None]):
     """Default screen with placeholder dashboard panels."""
 
     def compose(self) -> ComposeResult:
-        yield Header()
+        yield Header(show_clock=True)
         with Container(id="dashboard-grid"):
             yield DashboardPanel(
                 "Population",
