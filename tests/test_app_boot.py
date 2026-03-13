@@ -4,13 +4,16 @@ import pytest
 from textual.widgets import Footer, Header
 
 from nodeborn.app import NodebornApp
+from nodeborn.ui.screens.dashboard import DashboardScreen
 
 
 @pytest.mark.asyncio
-async def test_app_shell_mounts_header_and_footer() -> None:
+async def test_app_boots_on_dashboard_screen() -> None:
     app = NodebornApp()
 
-    async with app.run_test() as _pilot:
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        assert isinstance(app.screen, DashboardScreen)
         assert app.query_one(Header)
         assert app.query_one(Footer)
 
