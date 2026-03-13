@@ -1,0 +1,10 @@
+#map-placeholder {
+    height: 1fr;
+    align: center middle;
+}
+
+#map-placeholder-text {
+    border: round $accent;
+    padding: 1 2;
+    width: auto;
+}

@@ -25,7 +25,7 @@ dev = [
 ]
 
 [project.scripts]
-nodeborn = "nodeborn.main:main"
+nodeborn = "nodeborn.app:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
