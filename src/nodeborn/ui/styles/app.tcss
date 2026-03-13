@@ -1,0 +1,12 @@
+/* Base app shell theme using S0.2 color tokens. */
+Screen {
+    background: $background;
+    color: $foreground;
+}
+
+Header,
+Footer {
+    background: $panel;
+    color: $foreground;
+    border: tall $border;
+}
