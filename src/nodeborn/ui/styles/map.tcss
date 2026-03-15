@@ -1,18 +1,24 @@
 #map-layout {
     layout: vertical;
     height: 1fr;
+    align: center middle;
+    padding: 1 2;
 }
 
 #map-view {
-    width: 1fr;
-    height: 1fr;
+    width: 68;
+    height: 24;
+    max-width: 100%;
     border: round $primary;
     padding: 0 1;
     background: $surface;
 }
 
 #map-status {
+    width: 68;
+    max-width: 100%;
     height: 3;
     border: round $accent;
     padding: 0 1;
+    margin-top: 1;
 }
