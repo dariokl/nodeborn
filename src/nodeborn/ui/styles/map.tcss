@@ -1,12 +1,6 @@
-#map-placeholder {
+#map-layout {
+    layout: vertical;
     height: 1fr;
-    align: center middle;
-}
-
-#map-placeholder-text {
-    border: round $accent;
-    padding: 1 2;
-    width: auto;
 }
 
 #map-view {
@@ -15,4 +9,10 @@
     border: round $primary;
     padding: 0 1;
     background: $surface;
+}
+
+#map-status {
+    height: 3;
+    border: round $accent;
+    padding: 0 1;
 }
