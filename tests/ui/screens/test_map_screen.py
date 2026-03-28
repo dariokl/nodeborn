@@ -2,15 +2,10 @@ from __future__ import annotations
 
 import pytest
 from rich.text import Text
-from textual.app import App
 from textual.widgets import Static
-from typing import Any, Callable, ClassVar
-
-from textual.screen import Screen
-
-from nodeborn.colony.map_gen import generate_map
 from nodeborn.ui.screens.map_screen import MapScreen
 from nodeborn.ui.widgets import MapView
+from tests.ui.conftest import MapScreenHarness
 
 
 def _status_text(status_widget: Static) -> str:
@@ -18,15 +13,6 @@ def _status_text(status_widget: Static) -> str:
     if isinstance(rendered, Text):
         return rendered.plain
     return str(rendered)
-
-
-class MapScreenHarness(App[None]):
-    """Minimal test app that mounts only the map screen."""
-
-    MODES: ClassVar[dict[str, str | Callable[[], Screen[Any]]]] = {
-        "map": lambda: MapScreen(generate_map(width=64, height=48, seed=0)),
-    }
-    DEFAULT_MODE = "map"
 
 
 @pytest.mark.asyncio

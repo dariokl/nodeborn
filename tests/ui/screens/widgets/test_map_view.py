@@ -2,52 +2,21 @@ from __future__ import annotations
 
 import pytest
 from rich.text import Text
-from textual.app import App, ComposeResult
+from nodeborn.colony.map import ColonyMap
 
-from nodeborn.colony.map import ColonyMap, TerrainType, Tile
 from nodeborn.colony.map_gen import generate_map
 from nodeborn.ui.widgets.map_view import (
     FALLBACK_VIEWPORT_HEIGHT,
     FALLBACK_VIEWPORT_WIDTH,
     MapView,
 )
-
-
-def _sample_map(width: int = 8, height: int = 4) -> ColonyMap:
-    terrain_cycle = [
-        TerrainType.GRASS,
-        TerrainType.PLAINS,
-        TerrainType.WATER,
-        TerrainType.MOUNTAIN,
-        TerrainType.FOREST,
-        TerrainType.SAND,
-        TerrainType.ROCK,
-        TerrainType.RIVER,
-    ]
-    tiles: list[list[Tile]] = []
-    for y in range(height):
-        row: list[Tile] = []
-        for x in range(width):
-            terrain = terrain_cycle[(x + y) % len(terrain_cycle)]
-            row.append(Tile(x=x, y=y, terrain=terrain))
-        tiles.append(row)
-    return ColonyMap(width=width, height=height, tiles=tiles, seed=42)
-
-
-class MapViewHarness(App[None]):
-    """Minimal app that mounts a single MapView widget."""
-
-    def __init__(self, colony_map: ColonyMap) -> None:
-        super().__init__()
-        self._colony_map = colony_map
-
-    def compose(self) -> ComposeResult:
-        yield MapView(self._colony_map)
+from tests.conftest import build_cycling_map
+from tests.ui.conftest import MapViewHarness
 
 
 @pytest.mark.asyncio
 async def test_map_view_mounts_without_error() -> None:
-    app = MapViewHarness(_sample_map())
+    app = MapViewHarness(build_cycling_map())
 
     async with app.run_test() as pilot:
         await pilot.pause()
@@ -56,7 +25,7 @@ async def test_map_view_mounts_without_error() -> None:
 
 @pytest.mark.asyncio
 async def test_map_view_render_contains_terrain_glyphs() -> None:
-    app = MapViewHarness(_sample_map())
+    app = MapViewHarness(build_cycling_map())
 
     async with app.run_test() as pilot:
         await pilot.pause()
@@ -116,8 +85,8 @@ def test_move_cursor_auto_scrolls_viewport_near_edge() -> None:
     assert map_view.viewport_y > start_viewport_y
 
 
-def test_cursor_status_text_includes_coords_and_terrain() -> None:
-    colony_map = _sample_map()
+def test_cursor_status_text_includes_coords_and_terrain(cycling_map: ColonyMap) -> None:
+    colony_map = cycling_map
     map_view = MapView(colony_map)
 
     map_view.cursor_x = 0

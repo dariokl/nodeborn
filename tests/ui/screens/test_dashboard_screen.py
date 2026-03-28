@@ -1,25 +1,11 @@
 from __future__ import annotations
 
 import pytest
-from textual.app import App
 from textual.css.query import NoMatches
 from textual.widgets import Footer, Header
-from typing import Any, Callable, ClassVar
-
-from textual.app import App
-from textual.screen import Screen
 
 from nodeborn.ui.screens.dashboard import DashboardScreen
-
-
-class DashboardHarness(App[None]):
-    """Minimal test app that mounts only the dashboard screen."""
-
-    SCREENS = {"dashboard": DashboardScreen}
-    MODES: ClassVar[dict[str, str | Callable[[], Screen[Any]]]] = {
-        "dashboard": "dashboard",
-    }
-    DEFAULT_MODE = "dashboard"
+from tests.ui.conftest import DashboardHarness
 
 
 @pytest.mark.asyncio

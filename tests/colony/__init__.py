@@ -1,0 +1,1 @@
+"""Colony domain tests."""
