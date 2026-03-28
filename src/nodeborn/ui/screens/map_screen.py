@@ -49,7 +49,7 @@ class MapScreen(Screen[None]):
         self._move_cursor(1, 0)
 
     def action_back(self) -> None:
-        self.app.pop_screen()  # type: ignore # ignore type
+        self.dismiss()
 
     def _move_cursor(self, dx: int, dy: int) -> None:
         map_view = self.query_one(MapView)
