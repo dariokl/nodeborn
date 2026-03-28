@@ -7,7 +7,7 @@ from textual.containers import Container
 from textual.screen import Screen
 from textual.widgets import Footer, Header, Static
 
-from nodeborn.colony.map_gen import generate_map
+from nodeborn.colony.map import ColonyMap
 from nodeborn.ui.widgets import MapView
 
 
@@ -22,9 +22,9 @@ class MapScreen(Screen[None]):
         ("escape", "back", "Back"),
     ]
 
-    def __init__(self, width: int = 64, height: int = 48, seed: int = 0) -> None:
+    def __init__(self, colony_map: ColonyMap) -> None:
         super().__init__()
-        self._colony_map = generate_map(width=width, height=height, seed=seed)
+        self._colony_map = colony_map
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)

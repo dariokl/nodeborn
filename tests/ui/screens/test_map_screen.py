@@ -8,6 +8,7 @@ from typing import Any, Callable, ClassVar
 
 from textual.screen import Screen
 
+from nodeborn.colony.map_gen import generate_map
 from nodeborn.ui.screens.map_screen import MapScreen
 from nodeborn.ui.widgets import MapView
 
@@ -22,9 +23,8 @@ def _status_text(status_widget: Static) -> str:
 class MapScreenHarness(App[None]):
     """Minimal test app that mounts only the map screen."""
 
-    SCREENS = {"map": MapScreen}
     MODES: ClassVar[dict[str, str | Callable[[], Screen[Any]]]] = {
-        "map": "map",
+        "map": lambda: MapScreen(generate_map(width=64, height=48, seed=0)),
     }
     DEFAULT_MODE = "map"
 

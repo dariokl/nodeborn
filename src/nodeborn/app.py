@@ -7,6 +7,8 @@ from typing import Any, Callable, ClassVar
 from textual.app import App
 from textual.screen import Screen
 
+from nodeborn.colony.map import ColonyMap
+from nodeborn.colony.map_gen import generate_map
 from nodeborn.ui.screens.dashboard import DashboardScreen
 from nodeborn.ui.screens.map_screen import MapScreen
 from nodeborn.ui.theme import NODEBORN_THEME
@@ -14,6 +16,8 @@ from nodeborn.ui.theme import NODEBORN_THEME
 
 class NodebornApp(App[None]):
     """Main Textual application shell for Nodeborn."""
+
+    _colony_map: ColonyMap
 
     CSS_PATH = [
         "ui/styles/app.tcss",
@@ -25,7 +29,6 @@ class NodebornApp(App[None]):
     SUB_TITLE = "Day 1 | Spring | Clear"
     SCREENS = {
         "dashboard": DashboardScreen,
-        "map": MapScreen,
     }
     MODES: ClassVar[dict[str, str | Callable[[], Screen[Any]]]] = {
         "dashboard": "dashboard",
@@ -40,10 +43,11 @@ class NodebornApp(App[None]):
         """Register and activate the Nodeborn theme."""
         self.register_theme(NODEBORN_THEME)
         self.theme = NODEBORN_THEME.name
+        self._colony_map = generate_map()
 
     def action_open_map(self) -> None:
         """Push the map screen on top of the dashboard stack."""
-        self.push_screen("map")
+        self.push_screen(MapScreen(self._colony_map))
 
 
 def main() -> None:
