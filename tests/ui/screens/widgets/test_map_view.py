@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pytest
 from rich.text import Text
 from nodeborn.colony.map import ColonyMap
 
@@ -14,7 +13,6 @@ from tests.conftest import build_cycling_map
 from tests.ui.conftest import MapViewHarness
 
 
-@pytest.mark.asyncio
 async def test_map_view_mounts_without_error() -> None:
     app = MapViewHarness(build_cycling_map())
 
@@ -23,7 +21,6 @@ async def test_map_view_mounts_without_error() -> None:
         assert app.query_one(MapView)
 
 
-@pytest.mark.asyncio
 async def test_map_view_render_contains_terrain_glyphs() -> None:
     app = MapViewHarness(build_cycling_map())
 

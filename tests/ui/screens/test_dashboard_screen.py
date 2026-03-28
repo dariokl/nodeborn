@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pytest
 from textual.css.query import NoMatches
 from textual.widgets import Footer, Header
 
@@ -8,7 +7,6 @@ from nodeborn.ui.screens.dashboard import DashboardScreen
 from tests.ui.conftest import DashboardHarness
 
 
-@pytest.mark.asyncio
 async def test_dashboard_screen_mounts_chrome() -> None:
     app = DashboardHarness()
 
@@ -19,7 +17,6 @@ async def test_dashboard_screen_mounts_chrome() -> None:
         assert app.query_one(Footer)
 
 
-@pytest.mark.asyncio
 async def test_dashboard_screen_mounts_all_placeholder_panels() -> None:
     app = DashboardHarness()
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pytest
 from rich.text import Text
 from textual.widgets import Static
 from nodeborn.ui.screens.map_screen import MapScreen
@@ -15,7 +14,6 @@ def _status_text(status_widget: Static) -> str:
     return str(rendered)
 
 
-@pytest.mark.asyncio
 async def test_map_screen_mounts_map_view_and_status() -> None:
     app = MapScreenHarness()
 
@@ -29,7 +27,6 @@ async def test_map_screen_mounts_map_view_and_status() -> None:
         assert "Terrain:" in text
 
 
-@pytest.mark.asyncio
 async def test_map_screen_arrow_keys_move_cursor_and_update_status() -> None:
     app = MapScreenHarness()
 

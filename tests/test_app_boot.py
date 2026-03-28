@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pytest
 from textual.widgets import Footer, Header
 
 from nodeborn.app import NodebornApp
@@ -8,7 +7,6 @@ from nodeborn.ui.screens.dashboard import DashboardScreen
 from nodeborn.ui.screens.map_screen import MapScreen
 
 
-@pytest.mark.asyncio
 async def test_app_boots_on_dashboard_screen() -> None:
     app = NodebornApp()
 
@@ -19,7 +17,6 @@ async def test_app_boots_on_dashboard_screen() -> None:
         assert app.query_one(Footer)
 
 
-@pytest.mark.asyncio
 async def test_app_navigation_dashboard_to_map_and_back() -> None:
     app = NodebornApp()
 
