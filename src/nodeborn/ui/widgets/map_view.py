@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from typing import cast
+
 from rich.text import Text
-from textual.reactive import reactive
+from textual.reactive import Reactive, reactive
 from textual.widget import Widget
 
 from nodeborn.colony.map import ColonyMap, TerrainType, Tile
@@ -40,8 +42,10 @@ class MapView(Widget):
     def __init__(self, colony_map: ColonyMap, *, id: str | None = "map-view") -> None:
         super().__init__(id=id)
         self.colony_map = colony_map
-        self.cursor_x = colony_map.width // 2
-        self.cursor_y = colony_map.height // 2
+        self.set_reactive(
+            cast(Reactive[int], MapView.cursor_x), colony_map.width // 2)
+        self.set_reactive(
+            cast(Reactive[int], MapView.cursor_y), colony_map.height // 2)
         self._center_viewport_on_cursor(
             FALLBACK_VIEWPORT_WIDTH, FALLBACK_VIEWPORT_HEIGHT)
 
