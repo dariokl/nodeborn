@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from rich.text import Text
+from textual.strip import Strip
 from nodeborn.colony.map import ColonyMap
 
 from nodeborn.colony.map_gen import generate_map
@@ -27,11 +27,18 @@ async def test_map_view_render_contains_terrain_glyphs() -> None:
     async with app.run_test() as pilot:
         await pilot.pause()
         map_view = app.query_one(MapView)
-        renderable = map_view.render()
-        assert isinstance(renderable, Text)
-        assert "≈" in renderable.plain
-        assert "▲" in renderable.plain
-        assert "♠" in renderable.plain
+        height = max(1, map_view.size.height)
+        strips = [map_view.render_line(y) for y in range(height)]
+
+        assert all(isinstance(strip, Strip) for strip in strips)
+
+        rendered_text = "\n".join(
+            "".join(segment.text for segment in strip)
+            for strip in strips
+        )
+        assert "≈" in rendered_text
+        assert "▲" in rendered_text
+        assert "♠" in rendered_text
 
 
 def test_map_view_keeps_cursor_inside_viewport_window() -> None:
@@ -40,7 +47,6 @@ def test_map_view_keeps_cursor_inside_viewport_window() -> None:
 
     map_view.cursor_x = 63
     map_view.cursor_y = 47
-    _ = map_view.render()  # public path recalculates viewport
 
     assert map_view.viewport_x <= map_view.cursor_x < (
         map_view.viewport_x + FALLBACK_VIEWPORT_WIDTH

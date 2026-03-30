@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from typing import cast
 
-from rich.text import Text
+from rich.segment import Segment
+from rich.style import Style
 from textual.reactive import Reactive, reactive
-from textual.widget import Widget
+from textual.scroll_view import ScrollView
+from textual.strip import Strip
 
 from nodeborn.colony.map import ColonyMap, TerrainType, Tile
 
@@ -24,7 +26,7 @@ TERRAIN_STYLES: dict[TerrainType, str] = {
 }
 
 
-class MapView(Widget):
+class MapView(ScrollView):
     """Render a map viewport centered around the current cursor."""
 
     colony_map: ColonyMap
@@ -141,26 +143,25 @@ class MapView(Widget):
     def _clamp(value: int, low: int, high: int) -> int:
         return max(low, min(value, high))
 
-    def render(self) -> Text:
+    def render_line(self, y: int) -> Strip:
         width, height = self._current_viewport_size()
 
-        canvas = Text()
-        for offset_y in range(height):
-            y = self.viewport_y + offset_y
-            for offset_x in range(width):
-                x = self.viewport_x + offset_x
-                tile = self.colony_map.get_tile(x, y)
-                if tile is None:
-                    canvas.append(" ")
-                    continue
+        if y < 0 or y >= height:
+            return Strip.blank(width)
 
-                glyph = tile.terrain.glyph
-                style = TERRAIN_STYLES[tile.terrain]
-                if x == self.cursor_x and y == self.cursor_y:
-                    style = f"{style} reverse bold"
-                canvas.append(glyph, style=style)
+        map_y = self.viewport_y + y
+        segments: list[Segment] = []
+        for offset_x in range(width):
+            map_x = self.viewport_x + offset_x
+            tile = self.colony_map.get_tile(map_x, map_y)
+            if tile is None:
+                segments.append(Segment(" "))
+                continue
 
-            if offset_y < (height - 1):
-                canvas.append("\n")
+            style = TERRAIN_STYLES[tile.terrain]
+            if map_x == self.cursor_x and map_y == self.cursor_y:
+                style = f"{style} reverse bold"
+            segments.append(Segment(tile.terrain.glyph,
+                            style=Style.parse(style)))
 
-        return canvas
+        return Strip(segments, width)
