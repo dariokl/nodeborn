@@ -24,7 +24,8 @@ def test_lookup_returns_spec_for_each_building_type() -> None:
 
 
 def test_all_building_specs_returns_stable_enum_order() -> None:
-    expected = tuple(get_building_spec(building_type) for building_type in BuildingType)
+    expected = tuple(get_building_spec(building_type)
+                     for building_type in BuildingType)
     assert all_building_specs() == expected
 
 
@@ -32,10 +33,11 @@ def test_farm_spec_matches_plan_constraints() -> None:
     farm = get_building_spec(BuildingType.FARM)
 
     assert farm.name == "Farm"
-    assert farm.glyph == "Ⓕ"
+    assert farm.glyph == "⚘"
     assert (farm.width, farm.height) == (2, 2)
     assert farm.cost == {"wood": 50}
-    assert farm.allowed_terrains == frozenset({TerrainType.GRASS, TerrainType.PLAINS})
+    assert farm.allowed_terrains == frozenset(
+        {TerrainType.GRASS, TerrainType.PLAINS})
 
 
 def test_buildable_terrain_set_excludes_blocked_terrain() -> None:

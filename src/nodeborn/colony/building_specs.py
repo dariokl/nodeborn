@@ -67,7 +67,7 @@ BUILDING_SPECS: Final[dict[BuildingType, BuildingSpec]] = {
     BuildingType.FARM: BuildingSpec(
         building_type=BuildingType.FARM,
         name="Farm",
-        glyph="Ⓕ",
+        glyph="⚘",
         width=2,
         height=2,
         cost={"wood": 50},
@@ -77,7 +77,7 @@ BUILDING_SPECS: Final[dict[BuildingType, BuildingSpec]] = {
     BuildingType.MINE: BuildingSpec(
         building_type=BuildingType.MINE,
         name="Mine",
-        glyph="Ⓜ",
+        glyph="⛏︎",
         width=2,
         height=2,
         cost={"wood": 40},
@@ -87,7 +87,7 @@ BUILDING_SPECS: Final[dict[BuildingType, BuildingSpec]] = {
     BuildingType.WORKSHOP: BuildingSpec(
         building_type=BuildingType.WORKSHOP,
         name="Workshop",
-        glyph="Ⓦ",
+        glyph="⚙",
         width=1,
         height=2,
         cost={"wood": 80},
@@ -97,7 +97,7 @@ BUILDING_SPECS: Final[dict[BuildingType, BuildingSpec]] = {
     BuildingType.STORAGE: BuildingSpec(
         building_type=BuildingType.STORAGE,
         name="Storage",
-        glyph="Ⓢ",
+        glyph="▣",
         width=2,
         height=2,
         cost={"wood": 60},
@@ -106,7 +106,7 @@ BUILDING_SPECS: Final[dict[BuildingType, BuildingSpec]] = {
     BuildingType.HOUSING: BuildingSpec(
         building_type=BuildingType.HOUSING,
         name="Housing",
-        glyph="Ⓗ",
+        glyph="⌂",
         width=1,
         height=1,
         cost={"wood": 30},
@@ -116,7 +116,7 @@ BUILDING_SPECS: Final[dict[BuildingType, BuildingSpec]] = {
     BuildingType.HALL: BuildingSpec(
         building_type=BuildingType.HALL,
         name="Hall",
-        glyph="Ⓐ",
+        glyph="♜",
         width=3,
         height=3,
         cost={"wood": 120, "stone": 40},
@@ -125,7 +125,7 @@ BUILDING_SPECS: Final[dict[BuildingType, BuildingSpec]] = {
     BuildingType.WELL: BuildingSpec(
         building_type=BuildingType.WELL,
         name="Well",
-        glyph="Ⓛ",
+        glyph="◉",
         width=1,
         height=1,
         cost={"stone": 20},
@@ -135,7 +135,7 @@ BUILDING_SPECS: Final[dict[BuildingType, BuildingSpec]] = {
     BuildingType.LUMBER_CAMP: BuildingSpec(
         building_type=BuildingType.LUMBER_CAMP,
         name="Lumber Camp",
-        glyph="Ⓣ",
+        glyph="♣",
         width=2,
         height=2,
         cost={"wood": 45},
