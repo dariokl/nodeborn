@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from nodeborn.colony.building import Building
 from nodeborn.colony.building_specs import (
     BUILDING_SPECS,
     BUILDABLE_TERRAINS,
@@ -14,6 +15,7 @@ from nodeborn.colony.map_gen import generate_map
 __all__ = [
     "BUILDING_SPECS",
     "BUILDABLE_TERRAINS",
+    "Building",
     "BuildingSpec",
     "BuildingType",
     "ColonyMap",
