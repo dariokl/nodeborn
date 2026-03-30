@@ -39,6 +39,8 @@ class MapView(ScrollView):
         "mapview--sand",
         "mapview--rock",
         "mapview--river",
+        "mapview--cursor-strong",
+        "mapview--cursor-soft",
     }
 
     DEFAULT_CSS = """
@@ -52,6 +54,8 @@ class MapView(ScrollView):
     cursor_y = reactive(0)
     viewport_x = reactive(0)
     viewport_y = reactive(0)
+    ambient_phase = reactive(0)
+    cursor_pulse_on = reactive(True)
 
     def __init__(self, colony_map: ColonyMap, *, id: str | None = "map-view") -> None:
         super().__init__(id=id)
@@ -62,6 +66,11 @@ class MapView(ScrollView):
             cast(Reactive[int], MapView.cursor_y), colony_map.height // 2)
         self._center_viewport_on_cursor(
             FALLBACK_VIEWPORT_WIDTH, FALLBACK_VIEWPORT_HEIGHT)
+
+    def on_mount(self) -> None:
+        """Start lightweight ambient animation loops for map liveliness."""
+        self.set_interval(0.50, self._advance_ambient_phase)
+        self.set_interval(0.35, self._toggle_cursor_pulse)
 
     def move_cursor(self, dx: int, dy: int) -> bool:
         """Move cursor by delta, clamped to map bounds."""
@@ -83,7 +92,37 @@ class MapView(ScrollView):
     def cursor_status_text(self) -> str:
         """Human-readable status text for bottom status bars."""
         tile = self.cursor_tile()
-        return f"Cursor ({tile.x}, {tile.y}) | Terrain: {tile.terrain.value.title()}"
+        return (
+            f"Cursor ({tile.x}, {tile.y}) | "
+            f"Terrain: {tile.terrain.value.title()} | "
+            f"Fertility: {tile.fertility:.2f} | "
+            f"Elevation: {tile.elevation:.2f} | "
+            f"Buildable: {self._buildability_label(tile.terrain)}"
+        )
+
+    def _buildability_label(self, terrain: TerrainType) -> str:
+        if terrain in {TerrainType.GRASS, TerrainType.PLAINS, TerrainType.SAND}:
+            return "Yes"
+        if terrain is TerrainType.FOREST:
+            return "Conditional (clear first)"
+        return "No"
+
+    def _advance_ambient_phase(self) -> None:
+        self.ambient_phase = (self.ambient_phase + 1) % 4
+        self.refresh()
+
+    def _toggle_cursor_pulse(self) -> None:
+        self.cursor_pulse_on = not self.cursor_pulse_on
+        self.refresh()
+
+    def _animated_glyph(self, tile: Tile, map_x: int, map_y: int) -> str:
+        if tile.terrain is TerrainType.WATER:
+            return "≈" if (self.ambient_phase + map_x + map_y) % 2 == 0 else "∼"
+        if tile.terrain is TerrainType.RIVER:
+            return "~" if (self.ambient_phase + map_x) % 2 == 0 else "≈"
+        if tile.terrain is TerrainType.FOREST:
+            return "♠" if (self.ambient_phase + map_y) % 3 != 0 else "♣"
+        return tile.terrain.glyph
 
     def watch_cursor_x(self, _old: int, _new: int) -> None:
         width, height = self._current_viewport_size()
@@ -171,7 +210,10 @@ class MapView(ScrollView):
             component = TERRAIN_COMPONENTS[tile.terrain]
             style = self.get_component_rich_style(component)
             if map_x == self.cursor_x and map_y == self.cursor_y:
-                style = style + Style(reverse=True, bold=True)
-            segments.append(Segment(tile.terrain.glyph, style=style))
+                cursor_component = "mapview--cursor-strong" if self.cursor_pulse_on else "mapview--cursor-soft"
+                cursor_style = self.get_component_rich_style(cursor_component)
+                style = style + cursor_style + Style(reverse=True, bold=True)
+            segments.append(Segment(self._animated_glyph(
+                tile, map_x, map_y), style=style))
 
         return Strip(segments, width)

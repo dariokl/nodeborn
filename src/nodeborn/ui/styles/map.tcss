@@ -54,3 +54,13 @@ MapView > .mapview--rock {
 MapView > .mapview--river {
     color: $terrain-river;
 }
+
+MapView > .mapview--cursor-strong {
+    background: $accent 35%;
+    color: $text;
+}
+
+MapView > .mapview--cursor-soft {
+    background: $primary 20%;
+    color: $text;
+}

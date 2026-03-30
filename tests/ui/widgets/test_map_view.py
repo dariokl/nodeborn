@@ -98,3 +98,26 @@ def test_cursor_status_text_includes_coords_and_terrain(cycling_map: ColonyMap) 
 
     assert "Cursor (0, 0)" in status
     assert "Terrain:" in status
+    assert "Fertility:" in status
+    assert "Elevation:" in status
+    assert "Buildable:" in status
+
+
+async def test_ambient_animation_changes_water_glyph() -> None:
+    app = MapViewHarness(build_cycling_map(width=8, height=4))
+
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        map_view = app.query_one(MapView)
+
+        map_view.viewport_x = 0
+        map_view.viewport_y = 0
+        map_view.ambient_phase = 0
+        phase_zero = map_view.render_line(0)
+        phase_zero_text = "".join(segment.text for segment in phase_zero)
+
+        map_view.ambient_phase = 1
+        phase_one = map_view.render_line(0)
+        phase_one_text = "".join(segment.text for segment in phase_one)
+
+        assert phase_zero_text != phase_one_text
