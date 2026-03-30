@@ -19,6 +19,8 @@ class DashboardPanel(Static):
 class DashboardScreen(Screen[None]):
     """Default screen with placeholder dashboard panels."""
 
+    CSS_PATH = "../styles/dashboard.tcss"
+
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Container(id="dashboard-grid"):

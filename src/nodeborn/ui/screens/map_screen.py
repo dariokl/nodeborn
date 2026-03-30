@@ -14,6 +14,8 @@ from nodeborn.ui.widgets import MapView
 class MapScreen(Screen[None]):
     """Interactive map screen with cursor movement and tile status."""
 
+    CSS_PATH = "../styles/map.tcss"
+
     BINDINGS = [
         ("up", "cursor_up", "Up"),
         ("down", "cursor_down", "Down"),

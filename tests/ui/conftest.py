@@ -13,6 +13,7 @@ from nodeborn.colony.map_gen import (
 )
 from nodeborn.ui.screens.dashboard import DashboardScreen
 from nodeborn.ui.screens.map_screen import MapScreen
+from nodeborn.ui.theme import NODEBORN_APP_THEME_VARIABLES
 from nodeborn.ui.widgets import MapView
 
 
@@ -24,6 +25,12 @@ class DashboardHarness(App[None]):
         "dashboard": "dashboard",
     }
     DEFAULT_MODE = "dashboard"
+
+    def get_theme_variable_defaults(self) -> dict[str, str]:
+        return {
+            **super().get_theme_variable_defaults(),
+            **NODEBORN_APP_THEME_VARIABLES,
+        }
 
 
 class MapScreenHarness(App[None]):
@@ -40,6 +47,12 @@ class MapScreenHarness(App[None]):
     }
     DEFAULT_MODE = "map"
 
+    def get_theme_variable_defaults(self) -> dict[str, str]:
+        return {
+            **super().get_theme_variable_defaults(),
+            **NODEBORN_APP_THEME_VARIABLES,
+        }
+
 
 class MapViewHarness(App[None]):
     """Minimal app that mounts a single MapView widget."""
@@ -47,6 +60,12 @@ class MapViewHarness(App[None]):
     def __init__(self, colony_map: ColonyMap) -> None:
         super().__init__()
         self._colony_map = colony_map
+
+    def get_theme_variable_defaults(self) -> dict[str, str]:
+        return {
+            **super().get_theme_variable_defaults(),
+            **NODEBORN_APP_THEME_VARIABLES,
+        }
 
     def compose(self) -> ComposeResult:
         yield MapView(self._colony_map)
