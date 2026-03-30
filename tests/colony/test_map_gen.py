@@ -15,7 +15,6 @@ def test_generate_map_uses_default_dimensions() -> None:
 
     assert colony_map.width == DEFAULT_MAP_WIDTH
     assert colony_map.height == DEFAULT_MAP_HEIGHT
-    assert colony_map.seed == 0
 
 
 def test_generate_map_is_deterministic_for_same_seed() -> None:

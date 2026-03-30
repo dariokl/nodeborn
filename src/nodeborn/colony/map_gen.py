@@ -5,8 +5,8 @@ import random
 
 from nodeborn.colony.map import ColonyMap, TerrainType, Tile
 
-DEFAULT_MAP_WIDTH = 64
-DEFAULT_MAP_HEIGHT = 48
+DEFAULT_MAP_WIDTH = 128
+DEFAULT_MAP_HEIGHT = 128
 START_CLEAR_RADIUS = 5
 
 ELEVATION_ROCK_THRESHOLD = 0.92
@@ -42,7 +42,7 @@ FOREST_SPREAD_CHANCE = 0.75
 def generate_map(
     width: int = DEFAULT_MAP_WIDTH,
     height: int = DEFAULT_MAP_HEIGHT,
-    seed: int = 0,
+    seed: int = random.randint(0, 999999),
 ) -> ColonyMap:
     """Generate a deterministic colony map from width/height/seed."""
     if width <= 0 or height <= 0:
