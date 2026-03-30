@@ -27,6 +27,8 @@ TERRAIN_STYLES: dict[TerrainType, str] = {
 class MapView(Widget):
     """Render a map viewport centered around the current cursor."""
 
+    colony_map: ColonyMap
+
     DEFAULT_CSS = """
     MapView {
         width: 1fr;
@@ -141,7 +143,6 @@ class MapView(Widget):
 
     def render(self) -> Text:
         width, height = self._current_viewport_size()
-        self._sync_viewport_to_cursor(width, height)
 
         canvas = Text()
         for offset_y in range(height):

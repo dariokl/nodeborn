@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from nodeborn.colony.map import ColonyMap, TerrainType
 from nodeborn.colony.map_gen import DEFAULT_MAP_HEIGHT, DEFAULT_MAP_WIDTH, generate_map
 
@@ -42,3 +44,17 @@ def test_starting_area_is_buildable_near_map_center() -> None:
             tile = colony_map.get_tile(x, y)
             assert tile is not None
             assert tile.terrain in {TerrainType.GRASS, TerrainType.PLAINS}
+
+
+@pytest.mark.parametrize(
+    ("width", "height"),
+    [
+        (0, 10),
+        (10, 0),
+        (-1, 10),
+        (10, -1),
+    ],
+)
+def test_generate_map_raises_for_invalid_dimensions(width: int, height: int) -> None:
+    with pytest.raises(ValueError, match="width and height must be positive"):
+        generate_map(width=width, height=height, seed=1)

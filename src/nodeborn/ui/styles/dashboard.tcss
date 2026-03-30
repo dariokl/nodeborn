@@ -8,26 +8,6 @@
     height: 1fr;
 }
 
-#panel-population {
-    row-span: 1;
-    column-span: 1;
-}
-
-#panel-resources {
-    row-span: 1;
-    column-span: 1;
-}
-
-#panel-alerts {
-    row-span: 1;
-    column-span: 1;
-}
-
-#panel-event-log {
-    row-span: 1;
-    column-span: 1;
-}
-
 .dashboard-panel {
     background: $surface;
     color: #94a3b8;

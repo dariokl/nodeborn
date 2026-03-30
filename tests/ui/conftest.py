@@ -6,7 +6,11 @@ from textual.app import App, ComposeResult
 from textual.screen import Screen
 
 from nodeborn.colony.map import ColonyMap
-from nodeborn.colony.map_gen import generate_map
+from nodeborn.colony.map_gen import (
+    DEFAULT_MAP_HEIGHT,
+    DEFAULT_MAP_WIDTH,
+    generate_map,
+)
 from nodeborn.ui.screens.dashboard import DashboardScreen
 from nodeborn.ui.screens.map_screen import MapScreen
 from nodeborn.ui.widgets import MapView
@@ -26,7 +30,13 @@ class MapScreenHarness(App[None]):
     """Minimal test app that mounts only the map screen."""
 
     MODES: ClassVar[dict[str, str | Callable[[], Screen[Any]]]] = {
-        "map": lambda: MapScreen(generate_map(width=64, height=48, seed=0)),
+        "map": lambda: MapScreen(
+            generate_map(
+                width=DEFAULT_MAP_WIDTH,
+                height=DEFAULT_MAP_HEIGHT,
+                seed=0,
+            )
+        ),
     }
     DEFAULT_MODE = "map"
 

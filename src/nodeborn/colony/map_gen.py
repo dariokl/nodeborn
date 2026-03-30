@@ -9,6 +9,35 @@ DEFAULT_MAP_WIDTH = 64
 DEFAULT_MAP_HEIGHT = 48
 START_CLEAR_RADIUS = 5
 
+ELEVATION_ROCK_THRESHOLD = 0.92
+ELEVATION_MOUNTAIN_THRESHOLD = 0.78
+ELEVATION_WATER_THRESHOLD = 0.14
+
+MOISTURE_RIVER_THRESHOLD = 0.70
+MOISTURE_SAND_THRESHOLD = 0.18
+MOISTURE_FOREST_THRESHOLD = 0.74
+MOISTURE_PLAINS_THRESHOLD = 0.52
+
+BASE_FERTILITY = 0.35
+MOISTURE_FERTILITY_MULTIPLIER = 0.65
+PLAINS_FERTILITY_BONUS = 0.10
+FOREST_FERTILITY_BONUS = 0.05
+SAND_FERTILITY_PENALTY = 0.25
+
+WATER_BODY_RADIUS_X_MIN = 2
+WATER_BODY_RADIUS_X_MAX = 5
+WATER_BODY_RADIUS_Y_MIN = 2
+WATER_BODY_RADIUS_Y_MAX = 4
+WATER_BODY_EDGE_NOISE_MAX = 0.20
+
+MOUNTAIN_CLUSTER_RADIUS_MIN = 2
+MOUNTAIN_CLUSTER_RADIUS_MAX = 4
+MOUNTAIN_CORE_ROCK_CHANCE = 0.35
+
+FOREST_SCATTER_CHANCE = 0.16
+FOREST_RADIUS_ONE_CHANCE = 0.85
+FOREST_SPREAD_CHANCE = 0.75
+
 
 def generate_map(
     width: int = DEFAULT_MAP_WIDTH,
@@ -69,17 +98,17 @@ def generate_map(
 
 
 def _assign_terrain(elevation: float, moisture: float) -> TerrainType:
-    if elevation >= 0.92:
+    if elevation >= ELEVATION_ROCK_THRESHOLD:
         return TerrainType.ROCK
-    if elevation >= 0.78:
+    if elevation >= ELEVATION_MOUNTAIN_THRESHOLD:
         return TerrainType.MOUNTAIN
-    if elevation <= 0.14:
-        return TerrainType.RIVER if moisture >= 0.70 else TerrainType.WATER
-    if moisture <= 0.18:
+    if elevation <= ELEVATION_WATER_THRESHOLD:
+        return TerrainType.RIVER if moisture >= MOISTURE_RIVER_THRESHOLD else TerrainType.WATER
+    if moisture <= MOISTURE_SAND_THRESHOLD:
         return TerrainType.SAND
-    if moisture >= 0.74:
+    if moisture >= MOISTURE_FOREST_THRESHOLD:
         return TerrainType.FOREST
-    if moisture >= 0.52:
+    if moisture >= MOISTURE_PLAINS_THRESHOLD:
         return TerrainType.PLAINS
     return TerrainType.GRASS
 
@@ -93,13 +122,13 @@ def _fertility_for(terrain: TerrainType, moisture: float) -> float:
     }:
         return 0.0
 
-    fertility = 0.35 + (0.65 * moisture)
+    fertility = BASE_FERTILITY + (MOISTURE_FERTILITY_MULTIPLIER * moisture)
     if terrain is TerrainType.PLAINS:
-        fertility += 0.10
+        fertility += PLAINS_FERTILITY_BONUS
     elif terrain is TerrainType.FOREST:
-        fertility += 0.05
+        fertility += FOREST_FERTILITY_BONUS
     elif terrain is TerrainType.SAND:
-        fertility -= 0.25
+        fertility -= SAND_FERTILITY_PENALTY
 
     return _clamp01(fertility)
 
@@ -118,12 +147,14 @@ def _paint_water_bodies(
         if _distance_sq((cx, cy), center) <= (START_CLEAR_RADIUS + 2) ** 2:
             continue
 
-        radius_x = rng.randint(2, 5)
-        radius_y = rng.randint(2, 4)
+        radius_x = rng.randint(WATER_BODY_RADIUS_X_MIN,
+                               WATER_BODY_RADIUS_X_MAX)
+        radius_y = rng.randint(WATER_BODY_RADIUS_Y_MIN,
+                               WATER_BODY_RADIUS_Y_MAX)
         for y in range(max(0, cy - radius_y), min(height, cy + radius_y + 1)):
             for x in range(max(0, cx - radius_x), min(width, cx + radius_x + 1)):
                 norm = ((x - cx) / radius_x) ** 2 + ((y - cy) / radius_y) ** 2
-                if norm <= 1.0 + (rng.random() * 0.20):
+                if norm <= 1.0 + (rng.random() * WATER_BODY_EDGE_NOISE_MAX):
                     if grid[y][x] in {TerrainType.ROCK, TerrainType.MOUNTAIN}:
                         continue
                     grid[y][x] = TerrainType.WATER
@@ -143,14 +174,15 @@ def _paint_mountain_clusters(
         if _distance_sq((cx, cy), center) <= (START_CLEAR_RADIUS + 2) ** 2:
             continue
 
-        radius = rng.randint(2, 4)
+        radius = rng.randint(MOUNTAIN_CLUSTER_RADIUS_MIN,
+                             MOUNTAIN_CLUSTER_RADIUS_MAX)
         for y in range(max(0, cy - radius), min(height, cy + radius + 1)):
             for x in range(max(0, cx - radius), min(width, cx + radius + 1)):
                 if max(abs(x - cx), abs(y - cy)) > radius:
                     continue
                 if grid[y][x] in {TerrainType.WATER, TerrainType.RIVER}:
                     continue
-                if max(abs(x - cx), abs(y - cy)) <= 1 and rng.random() < 0.35:
+                if max(abs(x - cx), abs(y - cy)) <= 1 and rng.random() < MOUNTAIN_CORE_ROCK_CHANCE:
                     grid[y][x] = TerrainType.ROCK
                 else:
                     grid[y][x] = TerrainType.MOUNTAIN
@@ -165,7 +197,7 @@ def _scatter_forests(
 ) -> None:
     attempts = max(20, (width * height) // 3)
     for _ in range(attempts):
-        if rng.random() > 0.16:
+        if rng.random() > FOREST_SCATTER_CHANCE:
             continue
 
         cx = rng.randrange(width)
@@ -175,10 +207,10 @@ def _scatter_forests(
         if grid[cy][cx] not in {TerrainType.GRASS, TerrainType.PLAINS}:
             continue
 
-        radius = 1 if rng.random() < 0.85 else 2
+        radius = 1 if rng.random() < FOREST_RADIUS_ONE_CHANCE else 2
         for y in range(max(0, cy - radius), min(height, cy + radius + 1)):
             for x in range(max(0, cx - radius), min(width, cx + radius + 1)):
-                if grid[y][x] in {TerrainType.GRASS, TerrainType.PLAINS} and rng.random() < 0.75:
+                if grid[y][x] in {TerrainType.GRASS, TerrainType.PLAINS} and rng.random() < FOREST_SPREAD_CHANCE:
                     grid[y][x] = TerrainType.FOREST
 
 
