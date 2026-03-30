@@ -25,7 +25,8 @@ class Building:
             raise ValueError("location coordinates must be non-negative")
 
         if not 0.0 <= self.construction_progress <= 1.0:
-            raise ValueError("construction_progress must be between 0.0 and 1.0")
+            raise ValueError(
+                "construction_progress must be between 0.0 and 1.0")
 
         if self.workers_required < 0:
             raise ValueError("workers_required must be non-negative")
