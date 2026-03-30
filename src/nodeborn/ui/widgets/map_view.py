@@ -14,15 +14,15 @@ FALLBACK_VIEWPORT_WIDTH = 40
 FALLBACK_VIEWPORT_HEIGHT = 20
 VIEWPORT_EDGE_MARGIN = 4
 
-TERRAIN_STYLES: dict[TerrainType, str] = {
-    TerrainType.GRASS: "#7FB069",
-    TerrainType.PLAINS: "#D1B97F",
-    TerrainType.WATER: "#5FA8D3",
-    TerrainType.MOUNTAIN: "#A3A3A3",
-    TerrainType.FOREST: "#2D6A4F",
-    TerrainType.SAND: "#E9D8A6",
-    TerrainType.ROCK: "#6C757D",
-    TerrainType.RIVER: "#4EA8DE",
+TERRAIN_COMPONENTS: dict[TerrainType, str] = {
+    TerrainType.GRASS: "mapview--grass",
+    TerrainType.PLAINS: "mapview--plains",
+    TerrainType.WATER: "mapview--water",
+    TerrainType.MOUNTAIN: "mapview--mountain",
+    TerrainType.FOREST: "mapview--forest",
+    TerrainType.SAND: "mapview--sand",
+    TerrainType.ROCK: "mapview--rock",
+    TerrainType.RIVER: "mapview--river",
 }
 
 
@@ -30,6 +30,16 @@ class MapView(ScrollView):
     """Render a map viewport centered around the current cursor."""
 
     colony_map: ColonyMap
+    COMPONENT_CLASSES = {
+        "mapview--grass",
+        "mapview--plains",
+        "mapview--water",
+        "mapview--mountain",
+        "mapview--forest",
+        "mapview--sand",
+        "mapview--rock",
+        "mapview--river",
+    }
 
     DEFAULT_CSS = """
     MapView {
@@ -158,10 +168,10 @@ class MapView(ScrollView):
                 segments.append(Segment(" "))
                 continue
 
-            style = TERRAIN_STYLES[tile.terrain]
+            component = TERRAIN_COMPONENTS[tile.terrain]
+            style = self.get_component_rich_style(component)
             if map_x == self.cursor_x and map_y == self.cursor_y:
-                style = f"{style} reverse bold"
-            segments.append(Segment(tile.terrain.glyph,
-                            style=Style.parse(style)))
+                style = style + Style(reverse=True, bold=True)
+            segments.append(Segment(tile.terrain.glyph, style=style))
 
         return Strip(segments, width)

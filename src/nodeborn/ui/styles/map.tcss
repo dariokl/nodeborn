@@ -22,3 +22,35 @@
     padding: 0 1;
     margin-top: 1;
 }
+
+MapView > .mapview--grass {
+    color: $terrain-grass;
+}
+
+MapView > .mapview--plains {
+    color: $terrain-plains;
+}
+
+MapView > .mapview--water {
+    color: $terrain-water;
+}
+
+MapView > .mapview--mountain {
+    color: $terrain-mountain;
+}
+
+MapView > .mapview--forest {
+    color: $terrain-forest;
+}
+
+MapView > .mapview--sand {
+    color: $terrain-sand;
+}
+
+MapView > .mapview--rock {
+    color: $terrain-rock;
+}
+
+MapView > .mapview--river {
+    color: $terrain-river;
+}
