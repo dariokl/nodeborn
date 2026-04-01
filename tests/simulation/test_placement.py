@@ -7,7 +7,8 @@ from tests.conftest import build_uniform_map
 
 
 def test_validate_placement_accepts_valid_farm_placement() -> None:
-    colony_map = build_uniform_map(width=6, height=6, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=6, height=6, terrain=TerrainType.GRASS)
     state = new_colony_state(colony_map)
 
     valid, reason = validate_placement(state, BuildingType.FARM, x=1, y=1)
@@ -17,7 +18,8 @@ def test_validate_placement_accepts_valid_farm_placement() -> None:
 
 
 def test_validate_placement_rejects_out_of_bounds_footprint() -> None:
-    colony_map = build_uniform_map(width=3, height=3, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=3, height=3, terrain=TerrainType.GRASS)
     state = new_colony_state(colony_map)
 
     valid, reason = validate_placement(state, BuildingType.FARM, x=2, y=2)
@@ -27,7 +29,8 @@ def test_validate_placement_rejects_out_of_bounds_footprint() -> None:
 
 
 def test_validate_placement_rejects_unaffordable_building() -> None:
-    colony_map = build_uniform_map(width=6, height=6, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=6, height=6, terrain=TerrainType.GRASS)
     state = new_colony_state(
         colony_map,
         starting_resources={
@@ -57,7 +60,8 @@ def test_validate_placement_rejects_invalid_terrain_for_farm() -> None:
 
 
 def test_validate_placement_rejects_overlap_with_existing_building() -> None:
-    colony_map = build_uniform_map(width=8, height=8, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=8, height=8, terrain=TerrainType.GRASS)
     existing_building = Building(
         id="existing-housing",
         building_type=BuildingType.HOUSING,
@@ -73,7 +77,8 @@ def test_validate_placement_rejects_overlap_with_existing_building() -> None:
 
 
 def test_validate_placement_rejects_mine_when_not_touching_mountain() -> None:
-    colony_map = build_uniform_map(width=8, height=8, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=8, height=8, terrain=TerrainType.GRASS)
     state = new_colony_state(colony_map)
 
     valid, reason = validate_placement(state, BuildingType.MINE, x=2, y=2)
@@ -83,7 +88,8 @@ def test_validate_placement_rejects_mine_when_not_touching_mountain() -> None:
 
 
 def test_validate_placement_accepts_mine_touching_mountain() -> None:
-    colony_map = build_uniform_map(width=8, height=8, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=8, height=8, terrain=TerrainType.GRASS)
     colony_map.tiles[1][3].terrain = TerrainType.MOUNTAIN
     state = new_colony_state(colony_map)
 
