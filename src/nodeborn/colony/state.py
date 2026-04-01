@@ -34,7 +34,8 @@ class ColonyState:
 def new_colony_state(
     colony_map: ColonyMap,
     *,
-    starting_resources: Mapping[Resource, int] | Mapping[str, int] | None = None,
+    starting_resources: Mapping[Resource,
+                                int] | Mapping[str, int] | None = None,
     buildings: Iterable[Building] | None = None,
 ) -> ColonyState:
     """Create a new colony with default or custom starting resources."""
