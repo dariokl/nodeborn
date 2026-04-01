@@ -188,7 +188,8 @@ async def test_ghost_preview_renders_selected_building_footprint_size() -> None:
         map_view.enter_build_mode(BuildingType.FARM)
 
         top_row = "".join(segment.text for segment in map_view.render_line(1))
-        bottom_row = "".join(segment.text for segment in map_view.render_line(2))
+        bottom_row = "".join(
+            segment.text for segment in map_view.render_line(2))
         farm_glyph = get_building_spec(BuildingType.FARM).glyph
 
         assert top_row[1:3] == farm_glyph * 2
