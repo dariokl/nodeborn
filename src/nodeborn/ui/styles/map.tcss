@@ -65,6 +65,11 @@ MapView > .mapview--cursor-soft {
     color: $text;
 }
 
+MapView > .mapview--building {
+    color: $warning;
+    text-style: bold;
+}
+
 MapView > .mapview--ghost-valid {
     background: $success 40%;
     color: $text;

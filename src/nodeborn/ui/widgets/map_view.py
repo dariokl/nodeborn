@@ -8,6 +8,7 @@ from textual.reactive import Reactive, reactive
 from textual.scroll_view import ScrollView
 from textual.strip import Strip
 
+from nodeborn.colony.building import Building
 from nodeborn.colony.building_specs import BuildingType, get_building_spec
 from nodeborn.colony.map import ColonyMap, TerrainType, Tile
 from nodeborn.colony.state import ColonyState
@@ -46,6 +47,7 @@ class MapView(ScrollView):
         "mapview--river",
         "mapview--cursor-strong",
         "mapview--cursor-soft",
+        "mapview--building",
         "mapview--ghost-valid",
         "mapview--ghost-invalid",
     }
@@ -127,6 +129,15 @@ class MapView(ScrollView):
                 f"{spec.name} ({spec.width}x{spec.height}) at ({tile.x}, {tile.y}) — "
                 f"{status_style} {status_icon} {reason}"
             )
+        building = self._building_at_tile(tile)
+        if building is not None:
+            spec = get_building_spec(building.building_type)
+            return (
+                f"Cursor ({tile.x}, {tile.y}) | "
+                f"Building: {spec.name} | "
+                f"Footprint: {spec.width}x{spec.height} | "
+                f"Progress: {building.construction_progress:.0%}"
+            )
         return (
             f"Cursor ({tile.x}, {tile.y}) | "
             f"Terrain: {tile.terrain.value.title()} | "
@@ -176,6 +187,15 @@ class MapView(ScrollView):
             for dx in range(spec.width):
                 tiles.add((self.cursor_x + dx, self.cursor_y + dy))
         return tiles
+
+    def _building_at_tile(self, tile: Tile) -> Building | None:
+        """Return the building occupying a tile, if any."""
+        if tile.building_id is None:
+            return None
+        for building in self.colony_state.buildings:
+            if building.id == tile.building_id:
+                return building
+        return None
 
     def _buildability_label(self, terrain: TerrainType) -> str:
         if terrain in {TerrainType.GRASS, TerrainType.PLAINS, TerrainType.SAND}:
@@ -294,6 +314,8 @@ class MapView(ScrollView):
         ghost_glyph: str | None = None
         if self.build_mode and self.selected_building_type is not None:
             ghost_glyph = get_building_spec(self.selected_building_type).glyph
+        buildings_by_id = {
+            building.id: building for building in self.colony_state.buildings}
 
         for offset_x in range(width):
             map_x = self.viewport_x + offset_x
@@ -304,6 +326,13 @@ class MapView(ScrollView):
 
             component = TERRAIN_COMPONENTS[tile.terrain]
             style = self.get_component_rich_style(component)
+            glyph = self._animated_glyph(tile, map_x, map_y)
+
+            if tile.building_id is not None and tile.building_id in buildings_by_id:
+                building = buildings_by_id[tile.building_id]
+                building_spec = get_building_spec(building.building_type)
+                glyph = building_spec.glyph
+                style = self.get_component_rich_style("mapview--building")
 
             # Ghost footprint rendering
             is_ghost_tile = (map_x, map_y) in ghost_tiles
@@ -334,11 +363,8 @@ class MapView(ScrollView):
                 )
                 cursor_style = self.get_component_rich_style(cursor_component)
                 style = style + cursor_style + Style(reverse=True, bold=True)
-                segments.append(Segment(self._animated_glyph(
-                    tile, map_x, map_y), style=style))
+                segments.append(Segment(glyph, style=style))
             else:
-                # Normal terrain tile
-                segments.append(Segment(self._animated_glyph(
-                    tile, map_x, map_y), style=style))
+                segments.append(Segment(glyph, style=style))
 
         return Strip(segments, width)

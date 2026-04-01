@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from textual.strip import Strip
+
+from nodeborn.application.commands import PlaceBuildingCommand, place_building
+from nodeborn.colony.building_specs import BuildingType, get_building_spec
 from nodeborn.colony.map import ColonyMap
 
 from nodeborn.colony.map_gen import generate_map
@@ -125,3 +128,48 @@ async def test_ambient_animation_changes_water_glyph() -> None:
         phase_one_text = "".join(segment.text for segment in phase_one)
 
         assert phase_zero_text != phase_one_text
+
+
+async def test_map_view_renders_placed_building_glyph_across_footprint() -> None:
+    colony_state = new_colony_state(generate_map(width=8, height=6, seed=0))
+    result = place_building(
+        colony_state,
+        PlaceBuildingCommand(building_type=BuildingType.FARM, x=1, y=1),
+    )
+
+    assert result.success is True
+
+    app = MapViewHarness(colony_state)
+
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        map_view = app.query_one(MapView)
+        map_view.viewport_x = 0
+        map_view.viewport_y = 0
+
+        top_row = "".join(segment.text for segment in map_view.render_line(1))
+        bottom_row = "".join(
+            segment.text for segment in map_view.render_line(2))
+        farm_glyph = get_building_spec(BuildingType.FARM).glyph
+
+        assert top_row[1:3] == farm_glyph * 2
+        assert bottom_row[1:3] == farm_glyph * 2
+
+
+def test_cursor_status_text_includes_building_when_tile_is_occupied() -> None:
+    colony_state = new_colony_state(generate_map(width=8, height=6, seed=0))
+    result = place_building(
+        colony_state,
+        PlaceBuildingCommand(building_type=BuildingType.HOUSING, x=2, y=2),
+    )
+
+    assert result.success is True
+
+    map_view = MapView(colony_state)
+    map_view.cursor_x = 2
+    map_view.cursor_y = 2
+
+    status = map_view.cursor_status_text()
+
+    assert "Building: Housing" in status
+    assert "Progress: 0%" in status
