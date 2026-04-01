@@ -33,7 +33,15 @@ class MapScreen(Screen[None]):
     def __init__(self, colony_state: ColonyState) -> None:
         super().__init__()
         self._colony_state = colony_state
-        self._palette_open = False
+
+    @property
+    def _palette_open(self) -> bool:
+        """Whether the build palette is currently mounted in the DOM."""
+        try:
+            self.query_one("#build-palette", BuildPalette)
+            return True
+        except NoMatches:
+            return False
 
     def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
         """Control which actions appear in footer based on current mode."""
@@ -77,7 +85,6 @@ class MapScreen(Screen[None]):
         """Open the build palette to select a structure."""
         if self._palette_open:
             return
-        self._palette_open = True
         palette = BuildPalette(
             self._colony_state.stockpile, id="build-palette")
         self.mount(palette)
@@ -149,7 +156,6 @@ class MapScreen(Screen[None]):
             palette.remove()
         except NoMatches:
             pass
-        self._palette_open = False
 
     def _move_cursor(self, dx: int, dy: int) -> None:
         map_view = self.query_one(MapView)

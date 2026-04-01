@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 from rich.text import Text
-from textual.css.query import NoMatches
 
 from nodeborn.colony.building_specs import BuildingType
 from nodeborn.colony.map import TerrainType
@@ -146,14 +145,8 @@ async def test_map_screen_invalid_placement_is_rejected_with_reason() -> None:
         assert map_view.build_mode is True
 
 
-def test_close_palette_ignores_missing_palette(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_close_palette_ignores_missing_palette() -> None:
     screen = MapScreen(build_uniform_colony_state())
-    object.__setattr__(screen, "_palette_open", True)
-
-    def _raise_no_matches(*_: object, **__: object) -> None:
-        raise NoMatches("#build-palette")
-
-    monkeypatch.setattr(screen, "query_one", _raise_no_matches)
 
     getattr(screen, "_close_palette")()
 
@@ -162,7 +155,6 @@ def test_close_palette_propagates_unexpected_errors(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     screen = MapScreen(build_uniform_colony_state())
-    object.__setattr__(screen, "_palette_open", True)
 
     def _raise_runtime_error(*_: object, **__: object) -> None:
         raise RuntimeError("boom")
@@ -171,5 +163,3 @@ def test_close_palette_propagates_unexpected_errors(
 
     with pytest.raises(RuntimeError, match="boom"):
         getattr(screen, "_close_palette")()
-
-    assert getattr(screen, "_palette_open") is True
