@@ -56,6 +56,22 @@ def build_cycling_colony_state(
     return new_colony_state(colony_map)
 
 
+def build_uniform_colony_state(
+    width: int = 8,
+    height: int = 4,
+    terrain: TerrainType = TerrainType.GRASS,
+    seed: int = 123,
+) -> ColonyState:
+    """Build a ColonyState with a uniform terrain map."""
+    colony_map = build_uniform_map(
+        width=width,
+        height=height,
+        terrain=terrain,
+        seed=seed,
+    )
+    return new_colony_state(colony_map)
+
+
 @pytest.fixture
 def uniform_map() -> ColonyMap:
     """Fixture for a small uniform grass map."""

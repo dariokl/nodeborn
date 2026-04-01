@@ -13,7 +13,7 @@ from nodeborn.ui.widgets.map_view import (
     FALLBACK_VIEWPORT_WIDTH,
     MapView,
 )
-from tests.conftest import build_cycling_colony_state
+from tests.conftest import build_cycling_colony_state, build_uniform_colony_state
 from tests.ui.conftest import MapViewHarness
 
 
@@ -173,3 +173,25 @@ def test_cursor_status_text_includes_building_when_tile_is_occupied() -> None:
 
     assert "Building: Housing" in status
     assert "Progress: 0%" in status
+
+
+async def test_ghost_preview_renders_selected_building_footprint_size() -> None:
+    app = MapViewHarness(build_uniform_colony_state(width=8, height=6))
+
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        map_view = app.query_one(MapView)
+        map_view.viewport_x = 0
+        map_view.viewport_y = 0
+        map_view.cursor_x = 1
+        map_view.cursor_y = 1
+        map_view.enter_build_mode(BuildingType.FARM)
+
+        top_row = "".join(segment.text for segment in map_view.render_line(1))
+        bottom_row = "".join(segment.text for segment in map_view.render_line(2))
+        farm_glyph = get_building_spec(BuildingType.FARM).glyph
+
+        assert top_row[1:3] == farm_glyph * 2
+        assert bottom_row[1:3] == farm_glyph * 2
+        assert top_row[3] != farm_glyph
+        assert bottom_row[3] != farm_glyph

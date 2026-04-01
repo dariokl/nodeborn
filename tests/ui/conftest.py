@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, Callable, ClassVar
 
 from textual.app import App, ComposeResult
-from textual.screen import Screen
 
 from nodeborn.colony.map_gen import (
     DEFAULT_MAP_HEIGHT,
@@ -46,16 +45,20 @@ def _create_test_colony_state():
 class MapScreenHarness(App[None]):
     """Minimal test app that mounts only the map screen."""
 
-    MODES: ClassVar[dict[str, str | Callable[[], Screen[Any]]]] = {
-        "map": lambda: MapScreen(_create_test_colony_state()),
-    }
-    DEFAULT_MODE = "map"
+    def __init__(self, colony_state: ColonyState | None = None) -> None:
+        super().__init__()
+        self._colony_state = (
+            _create_test_colony_state() if colony_state is None else colony_state
+        )
 
     def get_theme_variable_defaults(self) -> dict[str, str]:
         return {
             **super().get_theme_variable_defaults(),
             **NODEBORN_APP_THEME_VARIABLES,
         }
+
+    def on_mount(self) -> None:
+        self.push_screen(MapScreen(self._colony_state))
 
 
 class MapViewHarness(App[None]):
