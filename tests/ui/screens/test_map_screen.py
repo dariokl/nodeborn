@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import pytest
 from rich.text import Text
+from textual.css.query import NoMatches
 
 from nodeborn.colony.building_specs import BuildingType
 from nodeborn.colony.map import TerrainType
@@ -98,8 +100,12 @@ async def test_map_screen_confirm_placement_adds_building_and_deducts_resources(
         assert len(colony_state.buildings) == 1
         assert colony_state.buildings[0].building_type is BuildingType.FARM
         assert colony_state.stockpile.get(Resource.WOOD) == starting_wood - 50
-        assert colony_state.colony_map.get_tile(1, 1).building_id is not None
-        assert colony_state.colony_map.get_tile(2, 2).building_id is not None
+        tile_1_1 = colony_state.colony_map.get_tile(1, 1)
+        tile_2_2 = colony_state.colony_map.get_tile(2, 2)
+        assert tile_1_1 is not None
+        assert tile_2_2 is not None
+        assert tile_1_1.building_id is not None
+        assert tile_2_2.building_id is not None
 
         status = app.screen.query_one("#map-status", Static)
         text = _status_text(status)
@@ -138,3 +144,32 @@ async def test_map_screen_invalid_placement_is_rejected_with_reason() -> None:
         assert len(colony_state.buildings) == 0
         assert colony_state.stockpile.get(Resource.WOOD) == starting_wood
         assert map_view.build_mode is True
+
+
+def test_close_palette_ignores_missing_palette(monkeypatch: pytest.MonkeyPatch) -> None:
+    screen = MapScreen(build_uniform_colony_state())
+    object.__setattr__(screen, "_palette_open", True)
+
+    def _raise_no_matches(*_: object, **__: object) -> None:
+        raise NoMatches("#build-palette")
+
+    monkeypatch.setattr(screen, "query_one", _raise_no_matches)
+
+    getattr(screen, "_close_palette")()
+
+
+def test_close_palette_propagates_unexpected_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    screen = MapScreen(build_uniform_colony_state())
+    object.__setattr__(screen, "_palette_open", True)
+
+    def _raise_runtime_error(*_: object, **__: object) -> None:
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(screen, "query_one", _raise_runtime_error)
+
+    with pytest.raises(RuntimeError, match="boom"):
+        getattr(screen, "_close_palette")()
+
+    assert getattr(screen, "_palette_open") is True

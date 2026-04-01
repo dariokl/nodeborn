@@ -5,6 +5,7 @@ from __future__ import annotations
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.css.query import NoMatches
 from textual.containers import Container
 from textual.screen import Screen
 from textual.widgets import Footer, Header, Static
@@ -146,7 +147,7 @@ class MapScreen(Screen[None]):
         try:
             palette = self.query_one("#build-palette", BuildPalette)
             palette.remove()
-        except Exception:
+        except NoMatches:
             pass
         self._palette_open = False
 
