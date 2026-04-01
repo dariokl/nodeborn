@@ -10,7 +10,8 @@ from tests.conftest import build_uniform_map
 
 
 def test_place_building_adds_building_and_deducts_resources() -> None:
-    colony_map = build_uniform_map(width=8, height=8, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=8, height=8, terrain=TerrainType.GRASS)
     state = new_colony_state(colony_map)
 
     result = place_building(
@@ -27,7 +28,8 @@ def test_place_building_adds_building_and_deducts_resources() -> None:
 
 
 def test_place_building_marks_footprint_tiles_with_building_id() -> None:
-    colony_map = build_uniform_map(width=8, height=8, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=8, height=8, terrain=TerrainType.GRASS)
     state = new_colony_state(colony_map)
 
     result = place_building(
@@ -45,7 +47,8 @@ def test_place_building_marks_footprint_tiles_with_building_id() -> None:
 
 
 def test_place_building_rejects_invalid_location_without_state_changes() -> None:
-    colony_map = build_uniform_map(width=8, height=8, terrain=TerrainType.WATER)
+    colony_map = build_uniform_map(
+        width=8, height=8, terrain=TerrainType.WATER)
     state = new_colony_state(colony_map)
 
     result = place_building(
@@ -61,7 +64,8 @@ def test_place_building_rejects_invalid_location_without_state_changes() -> None
 
 
 def test_place_building_rejects_unaffordable_build_without_state_changes() -> None:
-    colony_map = build_uniform_map(width=8, height=8, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=8, height=8, terrain=TerrainType.GRASS)
     state = new_colony_state(
         colony_map,
         starting_resources={
@@ -86,7 +90,8 @@ def test_place_building_rejects_unaffordable_build_without_state_changes() -> No
 
 
 def test_place_building_allocates_next_available_building_id() -> None:
-    colony_map = build_uniform_map(width=8, height=8, terrain=TerrainType.GRASS)
+    colony_map = build_uniform_map(
+        width=8, height=8, terrain=TerrainType.GRASS)
     existing = Building(
         id="farm-1",
         building_type=BuildingType.FARM,
