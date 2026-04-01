@@ -46,12 +46,13 @@ def place_building(
         construction_progress=0.0,
     )
     state.buildings.append(building)
-
-    for tile_y in range(command.y, command.y + spec.height):
-        for tile_x in range(command.x, command.x + spec.width):
-            tile = state.colony_map.get_tile(tile_x, tile_y)
-            if tile is not None:  # Defensive guard; validate_placement already checks bounds.
-                tile.building_id = building_id
+    state.colony_map.place_building_on_footprint(
+        building_id=building_id,
+        x=command.x,
+        y=command.y,
+        width=spec.width,
+        height=spec.height,
+    )
 
     return PlaceBuildingResult(success=True, building_id=building_id)
 

@@ -87,3 +87,19 @@ class ColonyMap:
         if not self.in_bounds(x, y):
             return None
         return self.tiles[y][x]
+
+    def place_building_on_footprint(
+        self,
+        building_id: str,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+    ) -> None:
+        """Mark each tile in a rectangular footprint with a building id."""
+        for tile_y in range(y, y + height):
+            for tile_x in range(x, x + width):
+                tile = self.get_tile(tile_x, tile_y)
+                if tile is None:
+                    raise ValueError("building footprint is out of map bounds")
+                tile.building_id = building_id

@@ -99,3 +99,37 @@ def test_colony_map_raises_on_tile_coordinate_mismatch() -> None:
             tiles=bad_tiles,
             seed=valid_map.seed,
         )
+
+
+def test_place_building_on_footprint_marks_all_tiles() -> None:
+    colony_map = build_uniform_map(width=5, height=4)
+
+    colony_map.place_building_on_footprint(
+        building_id="farm-1",
+        x=1,
+        y=1,
+        width=2,
+        height=2,
+    )
+
+    assert colony_map.get_tile(1, 1) is not None
+    assert colony_map.get_tile(2, 1) is not None
+    assert colony_map.get_tile(1, 2) is not None
+    assert colony_map.get_tile(2, 2) is not None
+    assert colony_map.get_tile(1, 1).building_id == "farm-1"
+    assert colony_map.get_tile(2, 1).building_id == "farm-1"
+    assert colony_map.get_tile(1, 2).building_id == "farm-1"
+    assert colony_map.get_tile(2, 2).building_id == "farm-1"
+
+
+def test_place_building_on_footprint_raises_when_out_of_bounds() -> None:
+    colony_map = build_uniform_map(width=3, height=3)
+
+    with pytest.raises(ValueError, match="building footprint is out of map bounds"):
+        colony_map.place_building_on_footprint(
+            building_id="farm-1",
+            x=2,
+            y=2,
+            width=2,
+            height=2,
+        )
