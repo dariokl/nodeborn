@@ -36,6 +36,12 @@ class NodebornApp(App[None]):
         ("q", "quit", "Quit"),
     ]
 
+    def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
+        """Hide Map binding when already on MapScreen."""
+        if action == "open_map":
+            return not isinstance(self.screen, MapScreen)
+        return True
+
     def get_theme_variable_defaults(self) -> dict[str, str]:
         """Expose app-specific CSS variables for all themes."""
         return {

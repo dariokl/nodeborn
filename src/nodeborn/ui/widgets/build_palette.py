@@ -29,7 +29,7 @@ class BuildPalette(Widget):
 
     DEFAULT_CSS = """
     BuildPalette {
-        width: 42;
+        width: 64;
         height: auto;
         border: round $accent;
         padding: 0 1;
@@ -94,8 +94,7 @@ class BuildPalette(Widget):
             row.append(f"{spec.width}x{spec.height:<3} ")
             row.append(cost_label)
             row.append("  ")
-            row.append("CAN" if affordable else "NO",
-                       style="green" if affordable else "red")
+            row.style = "green" if affordable else "red"
             if index == self.selected_index:
                 row.stylize("bold")
             lines.append(row)

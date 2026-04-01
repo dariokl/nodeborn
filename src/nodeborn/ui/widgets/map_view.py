@@ -32,6 +32,9 @@ TERRAIN_COMPONENTS: dict[TerrainType, str] = {
 class MapView(ScrollView):
     """Render a map viewport centered around the current cursor."""
 
+    # Disable ScrollView's default arrow key bindings — we handle cursor via MapScreen
+    BINDINGS = []
+
     COMPONENT_CLASSES = {
         "mapview--grass",
         "mapview--plains",
@@ -319,7 +322,8 @@ class MapView(ScrollView):
                         "mapview--cursor-strong" if self.cursor_pulse_on
                         else "mapview--cursor-soft"
                     )
-                    cursor_style = self.get_component_rich_style(cursor_component)
+                    cursor_style = self.get_component_rich_style(
+                        cursor_component)
                     style = style + cursor_style + Style(bold=True)
                 segments.append(Segment(ghost_glyph, style=style))
             elif is_cursor_tile:
@@ -330,9 +334,11 @@ class MapView(ScrollView):
                 )
                 cursor_style = self.get_component_rich_style(cursor_component)
                 style = style + cursor_style + Style(reverse=True, bold=True)
-                segments.append(Segment(self._animated_glyph(tile, map_x, map_y), style=style))
+                segments.append(Segment(self._animated_glyph(
+                    tile, map_x, map_y), style=style))
             else:
                 # Normal terrain tile
-                segments.append(Segment(self._animated_glyph(tile, map_x, map_y), style=style))
+                segments.append(Segment(self._animated_glyph(
+                    tile, map_x, map_y), style=style))
 
         return Strip(segments, width)
