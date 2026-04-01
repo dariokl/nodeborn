@@ -36,8 +36,7 @@ class MapScreen(Screen[None]):
 
     def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
         """Control which actions appear in footer based on current mode."""
-        map_view = self.query_one(
-            MapView, MapView) if self.is_mounted else None
+        map_view = self.query_one(MapView) if self.is_mounted else None
         in_build_mode = map_view.build_mode if map_view else False
 
         # Hide cursor movement when palette is open
