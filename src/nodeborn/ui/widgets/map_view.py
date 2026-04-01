@@ -8,7 +8,10 @@ from textual.reactive import Reactive, reactive
 from textual.scroll_view import ScrollView
 from textual.strip import Strip
 
+from nodeborn.colony.building_specs import BuildingType, get_building_spec
 from nodeborn.colony.map import ColonyMap, TerrainType, Tile
+from nodeborn.colony.state import ColonyState
+from nodeborn.simulation.placement import validate_placement
 
 FALLBACK_VIEWPORT_WIDTH = 40
 FALLBACK_VIEWPORT_HEIGHT = 20
@@ -29,7 +32,6 @@ TERRAIN_COMPONENTS: dict[TerrainType, str] = {
 class MapView(ScrollView):
     """Render a map viewport centered around the current cursor."""
 
-    colony_map: ColonyMap
     COMPONENT_CLASSES = {
         "mapview--grass",
         "mapview--plains",
@@ -41,6 +43,8 @@ class MapView(ScrollView):
         "mapview--river",
         "mapview--cursor-strong",
         "mapview--cursor-soft",
+        "mapview--ghost-valid",
+        "mapview--ghost-invalid",
     }
 
     DEFAULT_CSS = """
@@ -56,16 +60,35 @@ class MapView(ScrollView):
     viewport_y = reactive(0)
     ambient_phase = reactive(0)
     cursor_pulse_on = reactive(True)
+    build_mode: reactive[bool] = reactive(False)
+    selected_building_type: reactive[BuildingType | None] = reactive(None)
 
-    def __init__(self, colony_map: ColonyMap, *, id: str | None = "map-view") -> None:
+    def __init__(
+        self,
+        colony_state: ColonyState,
+        *,
+        id: str | None = "map-view",
+    ) -> None:
         super().__init__(id=id)
-        self.colony_map = colony_map
+        self._colony_state = colony_state
         self.set_reactive(
-            cast(Reactive[int], MapView.cursor_x), colony_map.width // 2)
+            cast(Reactive[int], MapView.cursor_x), self.colony_map.width // 2)
         self.set_reactive(
-            cast(Reactive[int], MapView.cursor_y), colony_map.height // 2)
+            cast(Reactive[int], MapView.cursor_y), self.colony_map.height // 2)
         self._center_viewport_on_cursor(
             FALLBACK_VIEWPORT_WIDTH, FALLBACK_VIEWPORT_HEIGHT)
+        # Cached placement validation result (valid, reason)
+        self._placement_result: tuple[bool, str] = (True, "")
+
+    @property
+    def colony_map(self) -> ColonyMap:
+        """Access the underlying colony map."""
+        return self._colony_state.colony_map
+
+    @property
+    def colony_state(self) -> ColonyState:
+        """Access the full colony state for placement validation."""
+        return self._colony_state
 
     def on_mount(self) -> None:
         """Start lightweight ambient animation loops for map liveliness."""
@@ -92,6 +115,15 @@ class MapView(ScrollView):
     def cursor_status_text(self) -> str:
         """Human-readable status text for bottom status bars."""
         tile = self.cursor_tile()
+        if self.build_mode and self.selected_building_type is not None:
+            spec = get_building_spec(self.selected_building_type)
+            valid, reason = self._placement_result
+            status_icon = "✓" if valid else "✗"
+            status_style = "VALID" if valid else "INVALID"
+            return (
+                f"{spec.name} ({spec.width}x{spec.height}) at ({tile.x}, {tile.y}) — "
+                f"{status_style} {status_icon} {reason}"
+            )
         return (
             f"Cursor ({tile.x}, {tile.y}) | "
             f"Terrain: {tile.terrain.value.title()} | "
@@ -99,6 +131,48 @@ class MapView(ScrollView):
             f"Elevation: {tile.elevation:.2f} | "
             f"Buildable: {self._buildability_label(tile.terrain)}"
         )
+
+    def enter_build_mode(self, building_type: BuildingType) -> None:
+        """Enter build mode with the specified building type selected."""
+        self.selected_building_type = building_type
+        self.build_mode = True
+        self._revalidate_placement()
+
+    def exit_build_mode(self) -> None:
+        """Exit build mode and clear selection."""
+        self.build_mode = False
+        self.selected_building_type = None
+        self._placement_result = (True, "")
+        self.refresh()
+
+    def is_placement_valid(self) -> bool:
+        """Return True if current cursor position is valid for placement."""
+        return self._placement_result[0]
+
+    def _revalidate_placement(self) -> None:
+        """Re-run placement validation at current cursor position."""
+        if not self.build_mode or self.selected_building_type is None:
+            self._placement_result = (True, "")
+            return
+        valid, reason = validate_placement(
+            self._colony_state,
+            self.selected_building_type,
+            self.cursor_x,
+            self.cursor_y,
+        )
+        self._placement_result = (valid, reason)
+        self.refresh()
+
+    def _ghost_footprint_tiles(self) -> set[tuple[int, int]]:
+        """Return set of (x, y) tiles covered by ghost footprint."""
+        if not self.build_mode or self.selected_building_type is None:
+            return set()
+        spec = get_building_spec(self.selected_building_type)
+        tiles: set[tuple[int, int]] = set()
+        for dy in range(spec.height):
+            for dx in range(spec.width):
+                tiles.add((self.cursor_x + dx, self.cursor_y + dy))
+        return tiles
 
     def _buildability_label(self, terrain: TerrainType) -> str:
         if terrain in {TerrainType.GRASS, TerrainType.PLAINS, TerrainType.SAND}:
@@ -127,12 +201,22 @@ class MapView(ScrollView):
     def watch_cursor_x(self, _old: int, _new: int) -> None:
         width, height = self._current_viewport_size()
         self._sync_viewport_to_cursor(width, height)
+        self._revalidate_placement()
         self.refresh()
 
     def watch_cursor_y(self, _old: int, _new: int) -> None:
         width, height = self._current_viewport_size()
         self._sync_viewport_to_cursor(width, height)
+        self._revalidate_placement()
         self.refresh()
+
+    def watch_build_mode(self, _old: bool, _new: bool) -> None:
+        self._revalidate_placement()
+
+    def watch_selected_building_type(
+        self, _old: BuildingType | None, _new: BuildingType | None
+    ) -> None:
+        self._revalidate_placement()
 
     def on_resize(self) -> None:
         """Keep viewport aligned when terminal size changes."""
@@ -200,6 +284,14 @@ class MapView(ScrollView):
 
         map_y = self.viewport_y + y
         segments: list[Segment] = []
+
+        # Pre-compute ghost footprint for this render pass
+        ghost_tiles = self._ghost_footprint_tiles()
+        ghost_valid = self._placement_result[0] if ghost_tiles else True
+        ghost_glyph: str | None = None
+        if self.build_mode and self.selected_building_type is not None:
+            ghost_glyph = get_building_spec(self.selected_building_type).glyph
+
         for offset_x in range(width):
             map_x = self.viewport_x + offset_x
             tile = self.colony_map.get_tile(map_x, map_y)
@@ -209,11 +301,38 @@ class MapView(ScrollView):
 
             component = TERRAIN_COMPONENTS[tile.terrain]
             style = self.get_component_rich_style(component)
-            if map_x == self.cursor_x and map_y == self.cursor_y:
-                cursor_component = "mapview--cursor-strong" if self.cursor_pulse_on else "mapview--cursor-soft"
+
+            # Ghost footprint rendering
+            is_ghost_tile = (map_x, map_y) in ghost_tiles
+            is_cursor_tile = map_x == self.cursor_x and map_y == self.cursor_y
+
+            if is_ghost_tile and ghost_glyph is not None:
+                # Use ghost style (green valid / red invalid)
+                ghost_component = (
+                    "mapview--ghost-valid" if ghost_valid else "mapview--ghost-invalid"
+                )
+                ghost_style = self.get_component_rich_style(ghost_component)
+                style = ghost_style
+                # Add pulsing effect to the anchor tile (cursor position)
+                if is_cursor_tile:
+                    cursor_component = (
+                        "mapview--cursor-strong" if self.cursor_pulse_on
+                        else "mapview--cursor-soft"
+                    )
+                    cursor_style = self.get_component_rich_style(cursor_component)
+                    style = style + cursor_style + Style(bold=True)
+                segments.append(Segment(ghost_glyph, style=style))
+            elif is_cursor_tile:
+                # Normal cursor highlight (not in build mode)
+                cursor_component = (
+                    "mapview--cursor-strong" if self.cursor_pulse_on
+                    else "mapview--cursor-soft"
+                )
                 cursor_style = self.get_component_rich_style(cursor_component)
                 style = style + cursor_style + Style(reverse=True, bold=True)
-            segments.append(Segment(self._animated_glyph(
-                tile, map_x, map_y), style=style))
+                segments.append(Segment(self._animated_glyph(tile, map_x, map_y), style=style))
+            else:
+                # Normal terrain tile
+                segments.append(Segment(self._animated_glyph(tile, map_x, map_y), style=style))
 
         return Strip(segments, width)

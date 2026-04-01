@@ -64,3 +64,19 @@ MapView > .mapview--cursor-soft {
     background: $primary 20%;
     color: $text;
 }
+
+MapView > .mapview--ghost-valid {
+    background: $success 40%;
+    color: $text;
+}
+
+MapView > .mapview--ghost-invalid {
+    background: $error 40%;
+    color: $text;
+}
+
+#build-palette {
+    dock: right;
+    margin: 1 2;
+    layer: overlay;
+}

@@ -4,17 +4,18 @@ from textual.strip import Strip
 from nodeborn.colony.map import ColonyMap
 
 from nodeborn.colony.map_gen import generate_map
+from nodeborn.colony.state import new_colony_state
 from nodeborn.ui.widgets.map_view import (
     FALLBACK_VIEWPORT_HEIGHT,
     FALLBACK_VIEWPORT_WIDTH,
     MapView,
 )
-from tests.conftest import build_cycling_map
+from tests.conftest import build_cycling_colony_state
 from tests.ui.conftest import MapViewHarness
 
 
 async def test_map_view_mounts_without_error() -> None:
-    app = MapViewHarness(build_cycling_map())
+    app = MapViewHarness(build_cycling_colony_state())
 
     async with app.run_test() as pilot:
         await pilot.pause()
@@ -22,7 +23,7 @@ async def test_map_view_mounts_without_error() -> None:
 
 
 async def test_map_view_render_contains_terrain_glyphs() -> None:
-    app = MapViewHarness(build_cycling_map())
+    app = MapViewHarness(build_cycling_colony_state())
 
     async with app.run_test() as pilot:
         await pilot.pause()
@@ -43,7 +44,8 @@ async def test_map_view_render_contains_terrain_glyphs() -> None:
 
 def test_map_view_keeps_cursor_inside_viewport_window() -> None:
     colony_map = generate_map(width=64, height=48, seed=7)
-    map_view = MapView(colony_map)
+    colony_state = new_colony_state(colony_map)
+    map_view = MapView(colony_state)
 
     map_view.cursor_x = 63
     map_view.cursor_y = 47
@@ -58,7 +60,8 @@ def test_map_view_keeps_cursor_inside_viewport_window() -> None:
 
 def test_move_cursor_clamps_to_map_bounds() -> None:
     colony_map = generate_map(width=8, height=6, seed=123)
-    map_view = MapView(colony_map)
+    colony_state = new_colony_state(colony_map)
+    map_view = MapView(colony_state)
 
     map_view.cursor_x = 0
     map_view.cursor_y = 0
@@ -76,7 +79,8 @@ def test_move_cursor_clamps_to_map_bounds() -> None:
 
 def test_move_cursor_auto_scrolls_viewport_near_edge() -> None:
     colony_map = generate_map(width=64, height=48, seed=456)
-    map_view = MapView(colony_map)
+    colony_state = new_colony_state(colony_map)
+    map_view = MapView(colony_state)
 
     start_viewport_x = map_view.viewport_x
     start_viewport_y = map_view.viewport_y
@@ -89,8 +93,8 @@ def test_move_cursor_auto_scrolls_viewport_near_edge() -> None:
 
 
 def test_cursor_status_text_includes_coords_and_terrain(cycling_map: ColonyMap) -> None:
-    colony_map = cycling_map
-    map_view = MapView(colony_map)
+    colony_state = new_colony_state(cycling_map)
+    map_view = MapView(colony_state)
 
     map_view.cursor_x = 0
     map_view.cursor_y = 0
@@ -104,7 +108,7 @@ def test_cursor_status_text_includes_coords_and_terrain(cycling_map: ColonyMap) 
 
 
 async def test_ambient_animation_changes_water_glyph() -> None:
-    app = MapViewHarness(build_cycling_map(width=8, height=4))
+    app = MapViewHarness(build_cycling_colony_state(width=8, height=4))
 
     async with app.run_test() as pilot:
         await pilot.pause()

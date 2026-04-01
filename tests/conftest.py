@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from nodeborn.colony.map import ColonyMap, TerrainType, Tile
+from nodeborn.colony.state import ColonyState, new_colony_state
 
 
 def build_uniform_map(
@@ -43,6 +44,16 @@ def build_cycling_map(
             row.append(Tile(x=x, y=y, terrain=terrain))
         tiles.append(row)
     return ColonyMap(width=width, height=height, tiles=tiles, seed=seed)
+
+
+def build_cycling_colony_state(
+    width: int = 8,
+    height: int = 4,
+    seed: int = 42,
+) -> ColonyState:
+    """Build a ColonyState with a cycling terrain map."""
+    colony_map = build_cycling_map(width=width, height=height, seed=seed)
+    return new_colony_state(colony_map)
 
 
 @pytest.fixture
