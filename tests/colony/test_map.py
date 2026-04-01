@@ -10,7 +10,7 @@ from tests.conftest import build_uniform_map
 def test_terrain_type_glyph_mapping_is_complete() -> None:
     expected = {
         TerrainType.GRASS: ".",
-        TerrainType.PLAINS: ",",
+        TerrainType.PLAINS: ".",
         TerrainType.WATER: "≈",
         TerrainType.MOUNTAIN: "▲",
         TerrainType.FOREST: "♠",

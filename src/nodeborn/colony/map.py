@@ -25,7 +25,7 @@ class TerrainType(str, Enum):
 
 TERRAIN_GLYPHS: Final[dict[TerrainType, str]] = {
     TerrainType.GRASS: ".",
-    TerrainType.PLAINS: ",",
+    TerrainType.PLAINS: ".",
     TerrainType.WATER: "≈",
     TerrainType.MOUNTAIN: "▲",
     TerrainType.FOREST: "♠",
